@@ -86,9 +86,17 @@ app.post("/api/owner/createproduct", upload.single("image"), async (req, res) =>
   }
 });
 
-app.get("/api/owner/allproducts", async (req, res) => {
+app.get("/api/owner/allproducts/", async (req, res) => {
   const products = await productModel.find();
   res.status(200).send({ products, success: true });
+});
+app.get("/api/user/profile/:email", async (req, res) => {
+  try {
+    const user = await userModel.findOne({ email: req.params.email });
+    res.status(200).send({ user, success: true });
+  } catch (err) {
+    res.status(500).send({ message: err.message, success: false });
+  }
 });
 
 app.listen(process.env.PORT, () => {

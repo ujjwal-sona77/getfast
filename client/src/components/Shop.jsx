@@ -166,70 +166,54 @@ const Shop = () => {
               {products.map((product, index) => (
                 <div
                   key={index}
-                  className="product-card bg-white rounded-xl shadow-sm overflow-hidden fade-in border border-gray-100"
+                  className="group relative bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 border border-gray-200"
                 >
-                  <div
-                    className="h-48 flex items-center justify-center"
-                    style={{ backgroundColor: product.bgcolor }}
-                  >
-                    <img
-                      src={imagefrombuffer({
-                        type: product.image?.contentType,
-                        data: product.image?.data?.data,
-                      })}
+                  <div className="aspect-w-1 aspect-h-1 w-full overflow-hidden bg-gray-50">
+                    <img 
+                      src={`data:image/jpeg;base64,${Buffer.Buffer.from(product.image).toString('base64')}`}
+                      alt={product.name}
+                      className="h-64 w-full object-cover object-center group-hover:scale-105 transition-transform duration-300"
                     />
+                    {product.discount > 0 && (
+                      <div className="absolute top-4 right-4">
+                        <span className="inline-flex items-center px-3 py-1.5 rounded-full text-sm font-medium bg-red-100 text-red-800">
+                          {Math.round((product.discount / (product.price + product.discount)) * 100)}% OFF
+                        </span>
+                      </div>
+                    )}
                   </div>
-                  <div
-                    className="p-4"
-                    style={{ backgroundColor: product.panelcolor }}
-                  >
-                    <div className="flex justify-between items-center">
+
+                  <div className="p-6">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                      {product.name}
+                    </h3>
+                    
+                    <div className="flex items-end justify-between">
                       <div>
-                        <h3
-                          className="font-medium text-lg product-name"
-                          style={{ color: product.textcolor }}
-                        >
-                          {product.name}
-                        </h3>
                         {product.discount ? (
-                          <>
-                            <p
-                              className="font-bold mt-2"
-                              style={{ color: product.textcolor }}
-                            >
+                          <div className="space-y-1">
+                            <p className="text-2xl font-bold text-gray-900">
                               ₹{product.price - product.discount}
                             </p>
-                            <p
-                              className="text-sm text-green-500"
-                              style={{ color: product.textcolor }}
-                            >
-                              (
-                              {Math.round(
-                                (product.discount /
-                                  (product.price + product.discount)) *
-                                  100
-                              )}
-                              % off)
-                            </p>
-                            <p className="text-sm text-gray-400 line-through font-semibold">
+                            <p className="text-sm text-gray-500 line-through">
                               ₹{product.price}
                             </p>
-                          </>
+                          </div>
                         ) : (
-                          <p
-                            className="font-bold mt-2"
-                            style={{ color: product.textcolor }}
-                          >
+                          <p className="text-2xl font-bold text-gray-900">
                             ₹{product.price}
                           </p>
                         )}
                       </div>
-                      <a
-                        href={`/addtocart/${index}`}
-                        className="p-3 bg-white rounded-full hover:bg-gray-50 transition-all duration-300 hover:shadow-md"
+
+                      <button
+                        className="flex items-center justify-center w-12 h-12 rounded-full bg-indigo-600 text-white hover:bg-indigo-700 transition-colors duration-200"
+                        aria-label="Add to cart"
                       >
-                        <i className="ri-add-line text-gray-700"></i>
-                      </a>
+                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                        </svg>
+                      </button>
                     </div>
                   </div>
                 </div>
