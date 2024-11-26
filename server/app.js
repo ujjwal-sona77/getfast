@@ -6,6 +6,7 @@ const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const cookieParser = require("cookie-parser");
 dotenv.config();
+const orderModel = require("./models/orderModel");
 const upload = require("./config/multer");
 const productModel = require("./models/productModel");
 const userModel = require("./models/userModel");
@@ -109,13 +110,49 @@ app.get("/api/owner/allproducts/", async (req, res) => {
 });
 app.get("/api/user/profile/:email", async (req, res) => {
   try {
-    const user = await userModel.findOne({ email: req.params.email }).populate("cart");
+    const user = await userModel
+      .findOne({ email: req.params.email })
+      .populate("cart");
     res.status(200).send({ user, success: true });
   } catch (err) {
     res.status(500).send({ message: err.message, success: false });
   }
 });
 
+app.post("/api/cart/increase/:productid/:email", async (req, res) => {
+  const user = await userModel.findOne({ email: req.params.email });
+  user.cart.push(req.params.productid);
+  await user.save();
+  res.status(200).send({ message: "Product added to cart", success: true });
+});
+
+app.post("/api/cart/decrease/:productid/:email", async (req, res) => {
+  const user = await userModel.findOne({ email: req.params.email });
+  // Find index of first matching product ID
+  const index = user.cart.findIndex(
+    (id) => id.toString() === req.params.productid
+  );
+  if (index !== -1) {
+    // Remove only one instance of the product
+    user.cart.splice(index, 1);
+    await user.save();
+  }
+  res.status(200).send({ message: "Product removed from cart", success: true });
+});
+
+app.post("/api/cart/remove/:productid/:email", async (req, res) => {
+  const user = await userModel.findOne({ email: req.params.email });
+  // Find index of first matching product ID
+  const index = user.cart.findIndex(
+    (id) => id.toString() === req.params.productid
+  );
+  if (index !== -1) {
+    // Remove only one instance of the product
+    user.cart.splice(index, 1);
+    await user.save();
+  }
+  res.status(200).send({ message: "Product removed from cart", success: true });
+});
 app.post(
   "/api/user/editprofile/:email",
   upload.single("picture"),
@@ -137,12 +174,33 @@ app.post(
       await user.save();
       let token = jwt.sign({ email: user.email }, process.env.JWT_SECRET);
       res.cookie("token", token);
-      res.status(200).send({ message: "Profile updated successfully", success: true });
+      res
+        .status(200)
+        .send({ message: "Profile updated successfully", success: true });
     } catch (err) {
       res.status(500).send({ message: err.message, success: false });
     }
   }
 );
+
+
+app.post("/api/orders/create/:email", async (req, res) => {
+  const user = await userModel.findOne({ email: req.params.email });
+  const order = await orderModel.create({
+    products: user.cart,
+    user: user._id,
+    address: req.body.address,
+    contactno: req.body.contactno,
+    paymentMethod: req.body.paymentMethod,
+    fullname: req.body.fullname,
+    city: req.body.city,
+    postalcode: req.body.postalcode
+  });
+  user.orders.push(order._id);
+  user.cart = [];
+  await user.save();
+  res.status(200).send({ message: "Order created successfully", success: true });
+});
 
 app.listen(process.env.PORT, () => {
   console.log(`Server is running on port ${process.env.PORT}`);

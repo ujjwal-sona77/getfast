@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import SignUp from './components/SignUp.jsx';
 import Login from './components/Login.jsx';
 import Shop from './components/Shop.jsx';
+import Checkout from './components/Checkout.jsx';
 import CreateProduct from './components/CreateProduct.jsx';
 import ProtectedRoutes from './components/ProtectedRoutes.jsx';
 import Cart from './components/Cart.jsx';
@@ -19,6 +20,7 @@ const App = () => {
         <Route path="/owner/createproduct" element={<CreateProduct />} />
         <Route path="/users/edit-profile" element={<EditProfile />} />
         <Route path="/cart" element={<Cart />} />
+        <Route path="/checkout" element={<Checkout />} />
       </Route>
     </Routes>
   )

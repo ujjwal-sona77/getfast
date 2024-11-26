@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Buffer } from 'buffer';
+import { useNavigate } from 'react-router-dom';
 const Profile = () => {
   const [user, setUser] = useState(null);
+  const navigate = useNavigate();
 
   const getEmailFromToken = () => {
     const token = document.cookie.split('=')[1];
@@ -51,8 +53,9 @@ const Profile = () => {
           <div className="bg-white rounded-2xl shadow-lg p-6 mb-8 hover-card fade-up" data-scroll data-scroll-speed="1">
             <div className="flex flex-col md:flex-row items-center gap-6">
               <div className="w-32 h-32 rounded-full overflow-hidden ring-4 ring-blue-100">
+              <img src="" alt="" />
                 {user.picture ? (
-                  <img src={`data:image/jpeg;base64,${Buffer.from(user.picture).toString('base64')}`} alt="Profile Photo" className="w-full h-full object-cover" />
+                  <img src={`data:image/png/jpeg;base64,${Buffer.from(user.picture).toString('base64')}`} alt="Profile Photo" className="w-full h-full object-cover" />
                 ) : (
                   <div className="w-full h-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center">
                     <span className="text-4xl text-white font-bold">
@@ -93,7 +96,7 @@ const Profile = () => {
                 const groupedItems = {};
                 user.cart.forEach(item => {
                   if (!groupedItems[item._id]) {
-                    groupedItems[item._id] = { ...item._doc };
+                    groupedItems[item._id] = { ...item };
                     groupedItems[item._id].quantity = item.quantity || 1;
                   } else {
                     groupedItems[item._id].quantity += (item.quantity || 1);
@@ -102,7 +105,7 @@ const Profile = () => {
 
                 return Object.values(groupedItems).map(item => (
                   <div className="flex flex-col md:flex-row items-center gap-4 p-4 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors" key={item._id}>
-                    <img src={`data:image/jpeg;base64,${item.image.toString('base64')}`} alt={item.name} className="w-24 h-24 object-cover rounded-lg" />
+                    <img src={`data:image/jpeg;base64,${Buffer.from(item.image).toString('base64')}`} alt={item.name} className="w-24 h-24 object-cover rounded-lg" />
 
                     <div className="flex-1 text-center md:text-left">
                       <h3 className="font-semibold text-lg text-gray-800">
