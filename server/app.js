@@ -32,7 +32,7 @@ app.post("/api/auth/signup", async (req, res) => {
           { id: user._id, email: user.email },
           process.env.JWT_SECRET
         );
-        res.cookie("token", token, { httpOnly: true });
+        res.cookie("token", token);
         res.send({ message: "User created successfully", success: true });
       });
     });
@@ -68,23 +68,40 @@ app.post("/api/auth/login", async (req, res) => {
   }
 });
 
-app.post("/api/owner/createproduct", upload.single("image"), async (req, res) => {
-  try {
-    const { name, price, discount } = req.body;
-    const image = req.file.buffer;
-    const product = await productModel.create({
-      name,
-      price,
-      discount,
-      image,
-    });
-    res
-      .status(200)
-      .send({ message: "Product created successfully", success: true });
-  } catch (error) {
-    res.status(500).send({ message: error.message, success: false });
-  }
+app.post("/api/cart/add/:productId/:user", async (req, res) => {
+  const productId = req.params.productId;
+  const user = await userModel.findOne({ email: req.params.user });
+  user.cart.push(productId);
+  await user.save();
+  res.status(200).send({ message: "Product added to cart", success: true });
 });
+
+app.get("/api/auth/logout", (req, res) => {
+  res.clearCookie("token");
+  res.send({ message: "Logout successful", success: true });
+});
+
+app.post(
+  "/api/owner/createproduct",
+  upload.single("image"),
+  async (req, res) => {
+    try {
+      const { name, price, discount } = req.body;
+      const image = req.file.buffer;
+      const product = await productModel.create({
+        name,
+        price,
+        discount,
+        image,
+      });
+      res
+        .status(200)
+        .send({ message: "Product created successfully", success: true });
+    } catch (error) {
+      res.status(500).send({ message: error.message, success: false });
+    }
+  }
+);
 
 app.get("/api/owner/allproducts/", async (req, res) => {
   const products = await productModel.find();
@@ -92,12 +109,40 @@ app.get("/api/owner/allproducts/", async (req, res) => {
 });
 app.get("/api/user/profile/:email", async (req, res) => {
   try {
-    const user = await userModel.findOne({ email: req.params.email });
+    const user = await userModel.findOne({ email: req.params.email }).populate("cart");
     res.status(200).send({ user, success: true });
   } catch (err) {
     res.status(500).send({ message: err.message, success: false });
   }
 });
+
+app.post(
+  "/api/user/editprofile/:email",
+  upload.single("picture"),
+  async (req, res) => {
+    try {
+      const user = await userModel.findOneAndUpdate(
+        { email: req.params.email },
+        { new: true }
+      );
+      if (req.file) {
+        user.picture = req.file.buffer;
+      }
+      if (req.body.fullname && req.body.fullname.trim() !== "") {
+        user.fullname = req.body.fullname;
+      }
+      if (req.body.email && req.body.email.trim() !== "") {
+        user.email = req.body.email;
+      }
+      await user.save();
+      let token = jwt.sign({ email: user.email }, process.env.JWT_SECRET);
+      res.cookie("token", token);
+      res.status(200).send({ message: "Profile updated successfully", success: true });
+    } catch (err) {
+      res.status(500).send({ message: err.message, success: false });
+    }
+  }
+);
 
 app.listen(process.env.PORT, () => {
   console.log(`Server is running on port ${process.env.PORT}`);

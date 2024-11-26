@@ -1,6 +1,6 @@
 import { useState, React } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const CreateProduct = () => {
   const [name, setName] = useState("");
@@ -40,18 +40,24 @@ const CreateProduct = () => {
           {/* Sidebar */}
           <div className="w-full lg:w-[25%] mb-8 lg:mb-0">
             <div className="flex flex-row lg:flex-col space-x-4 lg:space-x-0">
-              <a
+              <Link
                 className="block w-fit mb-0 lg:mb-2 hover:text-blue-500"
-                href="/owner/allproducts"
+                to="/owner/allproducts"
               >
                 All Products
-              </a>
-              <a
+              </Link>
+              <Link
                 className="block w-fit mb-0 lg:mb-2 hover:text-blue-500"
-                href="/owner/createproduct"
+                to="/owner/createproduct"
               >
                 Create new product
-              </a>
+              </Link>
+              <Link
+                className="block w-fit mb-0 lg:mb-2 hover:text-blue-500"
+                to="/shop"
+              >
+                Shop
+              </Link>
             </div>
           </div>
 

@@ -1,17 +1,40 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Buffer from "buffer";
+import { useParams } from "react-router-dom";
 import { imagefrombuffer } from "imagefrombuffer";
 
 const Shop = () => {
   const [products, setProducts] = useState([]);
   const [success, setSuccess] = useState("");
   const [error, setError] = useState("");
+  const [user, setUser] = useState({});
+
+  const getEmailFromToken = () => {
+    const token = document.cookie.split("=")[1];
+    if (!token) {
+      return null; // Return null instead of throwing an error
+    }
+    const payload = JSON.parse(atob(token.split(".")[1]));
+    return payload.email;
+  };
+
+  const email = getEmailFromToken();
 
   const getProducts = async () => {
     try {
-      const response = await axios.get("/api/owner/allproducts");
+      const response = await axios.get(`/api/owner/allproducts/`);
       setProducts(response.data.products);
+    } catch (err) {
+      setError(err.message);
+    }
+  };
+
+  const getUser = async () => {
+    try {
+      const response = await axios.get(`/api/user/profile/${email}`);
+      setUser(response.data.user);
+      console.log(response.data.user);
     } catch (err) {
       setError(err.message);
     }
@@ -19,6 +42,7 @@ const Shop = () => {
 
   useEffect(() => {
     getProducts();
+    getUser();
   }, []);
 
   return (
@@ -46,11 +70,25 @@ const Shop = () => {
               >
                 Shop
               </a>
+              {user?.isAdmin && (
+                <a
+                  href="/owner/createproduct"
+                  className="menu-transition text-gray-700 hover:text-blue-600 relative after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-0 after:h-0.5 after:bg-blue-600 hover:after:w-full after:transition-all"
+                >
+                  Create Product
+                </a>
+              )}
               <a
                 href="/cart"
                 className="menu-transition text-gray-700 hover:text-blue-600 relative after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-0 after:h-0.5 after:bg-blue-600 hover:after:w-full after:transition-all"
               >
                 Cart
+              </a>
+              <a
+                href="/profile"
+                className="menu-transition text-gray-700 hover:text-blue-600 relative after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-0 after:h-0.5 after:bg-blue-600 hover:after:w-full after:transition-all"
+              >
+                Profile
               </a>
               <a
                 href="/login"
@@ -169,15 +207,22 @@ const Shop = () => {
                   className="group relative bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 border border-gray-200"
                 >
                   <div className="aspect-w-1 aspect-h-1 w-full overflow-hidden bg-gray-50">
-                    <img 
-                      src={`data:image/jpeg;base64,${Buffer.Buffer.from(product.image).toString('base64')}`}
+                    <img
+                      src={`data:image/jpeg;base64,${Buffer.Buffer.from(
+                        product.image
+                      ).toString("base64")}`}
                       alt={product.name}
                       className="h-64 w-full object-cover object-center group-hover:scale-105 transition-transform duration-300"
                     />
                     {product.discount > 0 && (
                       <div className="absolute top-4 right-4">
                         <span className="inline-flex items-center px-3 py-1.5 rounded-full text-sm font-medium bg-red-100 text-red-800">
-                          {Math.round((product.discount / (product.price + product.discount)) * 100)}% OFF
+                          {Math.round(
+                            (product.discount /
+                              (product.price + product.discount)) *
+                              100
+                          )}
+                          % OFF
                         </span>
                       </div>
                     )}
@@ -187,7 +232,7 @@ const Shop = () => {
                     <h3 className="text-lg font-semibold text-gray-900 mb-2">
                       {product.name}
                     </h3>
-                    
+
                     <div className="flex items-end justify-between">
                       <div>
                         {product.discount ? (
@@ -205,13 +250,30 @@ const Shop = () => {
                           </p>
                         )}
                       </div>
-
                       <button
+                        onClick={async () => {
+                          try {
+                            await axios.post(`/api/cart/add/${product._id}/${email}`);
+                            setSuccess("Added to cart successfully!");
+                          } catch (err) {
+                            setError("Failed to add to cart");
+                          }
+                        }}
                         className="flex items-center justify-center w-12 h-12 rounded-full bg-indigo-600 text-white hover:bg-indigo-700 transition-colors duration-200"
                         aria-label="Add to cart"
                       >
-                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                        <svg
+                          className="w-6 h-6"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="2"
+                            d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                          />
                         </svg>
                       </button>
                     </div>

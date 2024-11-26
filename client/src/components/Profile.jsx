@@ -1,31 +1,36 @@
-import React, { useState, useEffect } from 'react'
-import axios from 'axios'
-
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import { Buffer } from 'buffer';
 const Profile = () => {
-  const [user, setUser] = useState({})
-  const [error, setError] = useState('')
-  useEffect(() => {
-    const getUser = async () => {
-      try {
-        const token = document.cookie.split('=')[1]
-        if (!token) {
-          throw new Error('No token found')
-        }
-        const [header, payload, signature] = token.split('.')
-        const decodedPayload = JSON.parse(atob(payload))
-        const email = decodedPayload.email
-        const response = await axios.get(`/api/user/profile/${email}`)
-        console.log(response.data)
-        setUser(response.data.user)
-      } catch (err) {
-        setError(err.message)
-      }
+  const [user, setUser] = useState(null);
+
+  const getEmailFromToken = () => {
+    const token = document.cookie.split('=')[1];
+    if (!token) {
+      return null; // Return null instead of throwing an error
     }
-    getUser()
-  }, [])
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    return payload.email;
+  };
+
+  const email = getEmailFromToken();
+
+  const getUser = async () => {
+    try {
+      if (!email) return; // Check if email is null before making the request
+      const response = await axios.get(`/api/user/profile/${email}`);
+      setUser(response.data.user);
+    } catch (err) {
+      console.error("Error fetching user profile:", err);
+    }
+  };
+
+  useEffect(() => {
+    getUser();
+  }, []);
 
   if (!user) {
-    return <div>Loading...</div>
+    return <div>Loading...</div>;
   }
 
   return (
@@ -47,7 +52,7 @@ const Profile = () => {
             <div className="flex flex-col md:flex-row items-center gap-6">
               <div className="w-32 h-32 rounded-full overflow-hidden ring-4 ring-blue-100">
                 {user.picture ? (
-                  <img src={`data:image/jpeg;base64,${user.picture.toString('base64')}`} alt="Profile Photo" className="w-full h-full object-cover" />
+                  <img src={`data:image/jpeg;base64,${Buffer.from(user.picture).toString('base64')}`} alt="Profile Photo" className="w-full h-full object-cover" />
                 ) : (
                   <div className="w-full h-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center">
                     <span className="text-4xl text-white font-bold">
@@ -67,35 +72,36 @@ const Profile = () => {
                 <a href="/users/edit-profile" className="inline-flex items-center px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors">
                   <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" 
-                      d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                          d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
                   </svg> Edit Profile
                 </a>
               </div>
             </div>
           </div>
+        </div>
+        <div className="bg-white rounded-2xl shadow-lg p-6 mb-8 hover-card slide-in" data-scroll data-scroll-speed="1.2">
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-2xl font-bold text-gray-800">Shopping Cart</h2>
+            <a href="/cart" className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors">
+              View Cart
+            </a>
+          </div>
 
-          {/* Cart Section */}
-          <div className="bg-white rounded-2xl shadow-lg p-6 mb-8 hover-card slide-in" data-scroll data-scroll-speed="1.2">
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-2xl font-bold text-gray-800">Shopping Cart</h2>
-              <a href="/cart" className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors">
-                View Cart
-              </a>
-            </div>
+          <div className="space-y-6">
+            {user.cart && user.cart.length > 0 ? (
+              (() => {
+                const groupedItems = {};
+                user.cart.forEach(item => {
+                  if (!groupedItems[item._id]) {
+                    groupedItems[item._id] = { ...item._doc };
+                    groupedItems[item._id].quantity = item.quantity || 1;
+                  } else {
+                    groupedItems[item._id].quantity += (item.quantity || 1);
+                  }
+                });
 
-            <div className="space-y-6">
-              {user.cart && user.cart.length > 0 ? (
-                Object.values(
-                  user.cart.reduce((groupedItems, item) => {
-                    if (!groupedItems[item._id]) {
-                      groupedItems[item._id] = {...item._doc, quantity: item.quantity || 1};
-                    } else {
-                      groupedItems[item._id].quantity += (item.quantity || 1);
-                    }
-                    return groupedItems;
-                  }, {})
-                ).map(item => (
-                  <div key={item._id} className="flex flex-col md:flex-row items-center gap-4 p-4 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors">
+                return Object.values(groupedItems).map(item => (
+                  <div className="flex flex-col md:flex-row items-center gap-4 p-4 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors" key={item._id}>
                     <img src={`data:image/jpeg;base64,${item.image.toString('base64')}`} alt={item.name} className="w-24 h-24 object-cover rounded-lg" />
 
                     <div className="flex-1 text-center md:text-left">
@@ -129,131 +135,107 @@ const Profile = () => {
                         <button type="submit" className="text-red-500 hover:text-red-700 transition-colors">
                           <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" 
-                              d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                  d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                           </svg>
                         </button>
                       </form>
                     </div>
                   </div>
-                ))
-              ) : (
-                <div className="text-center py-8 text-gray-500">
-                  Your cart is empty
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Orders Section */}
-          <div className="bg-white rounded-2xl shadow-lg p-6 hover-card fade-up" data-scroll data-scroll-speed="1.4">
-            <h2 className="text-2xl font-bold text-gray-800 mb-6">Order History</h2>
-
-            {orders && orders.length > 0 ? (
-              <div className="space-y-6">
-                {orders.map(order => (
-                  <div key={order._id} className="border rounded-xl p-6 hover:border-blue-500 transition-colors">
-                    <div className="grid md:grid-cols-2 gap-6">
-                      <div>
-                        <div className="mb-4">
-                          <span className={`px-4 py-2 rounded-full text-sm ${
-                            order.status === 'Pending' ? 'bg-yellow-100 text-yellow-800' :
-                            order.status === 'Delivered' ? 'bg-green-100 text-green-800' :
-                            'bg-blue-100 text-blue-800'
-                          }`}>
-                            {order.status}
-                          </span>
-                        </div>
-                        <div className="space-y-2 text-gray-600">
-                          <p><span className="font-medium">Address:</span> {order.address}</p>
-                          <p><span className="font-medium">Contact:</span> {order.contactno}</p>
-                          <p><span className="font-medium">Payment:</span> {order.paymentMethod}</p>
-                          <p><span className="font-medium">City:</span> {order.city}</p>
-                          <p><span className="font-medium">Postal Code:</span> {order.postalcode}</p>
-                          <p><span className="font-medium">Subtotal:</span> ₹
-                            {order.products.reduce((total, product) => total + (product?.price || 0) - (product?.discount || 0), 0)}
-                          </p>
-                          <p><span className="font-medium">Shipping:</span> ₹50</p>
-                          <p className="font-medium text-lg text-gray-800 mt-2">Total: ₹
-                            {order.products.reduce((total, product) => total + (product?.price || 0) - (product?.discount || 0), 0) + 50}
-                          </p>
-                        </div>
-                      </div>
-
-                      <div className="space-y-4">
-                        <details className="group">
-                          <summary className="flex justify-between items-center cursor-pointer bg-gray-50 p-4 rounded-lg">
-                            <h3 className="font-semibold text-lg text-gray-800">Products</h3>
-                            <span className="transform group-open:rotate-180 transition-transform">
-                              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"/>
-                              </svg>
-                            </span>
-                          </summary>
-                          {order.products && order.products.length > 0 ? (
-                            <div className="space-y-4 mt-4 pl-4">
-                              {Object.values(
-                                order.products.reduce((groups, product) => {
-                                  const id = product?._id?.toString();
-                                  if (!groups[id]) {
-                                    groups[id] = {
-                                      product: product,
-                                      quantity: 0
-                                    };
-                                  }
-                                  groups[id].quantity++;
-                                  return groups;
-                                }, {})
-                              ).map(({product, quantity}) => (
-                                <div key={product?._id} className="flex gap-4 p-4 rounded-lg bg-gray-50">
-                                  {product?.image ? (
-                                    <img src={`data:image/jpeg;base64,${product.image.toString('base64')}`} alt={product?.name} className="w-20 h-20 object-cover rounded-lg" />
-                                  ) : (
-                                    <div className="w-20 h-20 bg-gray-200 rounded-lg flex items-center justify-center">
-                                      <span className="text-gray-400">No image</span>
-                                    </div>
-                                  )}
-
-                                  <div>
-                                    <div className="flex items-center gap-2">
-                                      <h4 className="font-medium text-gray-800">
-                                        {product?.name || 'Product Name Not Available'}
-                                      </h4>
-                                      <span className="px-2 py-1 bg-blue-100 text-blue-800 text-sm rounded-full">
-                                        x{quantity}
-                                      </span>
-                                    </div>
-                                    <div className="mt-1 space-x-2">
-                                      <span className="text-gray-600">₹{product?.price || 0}</span>
-                                      {product?.discount && (
-                                        <span className="text-green-600">(-₹{product.discount})</span>
-                                      )}
-                                    </div>
-                                    <p className="text-sm text-gray-500 mt-1 line-clamp-2">
-                                      {product?.description || 'No description available'}
-                                    </p>
-                                  </div>
-                                </div>
-                              ))}
-                            </div>
-                          ) : (
-                            <p className="text-gray-500 mt-4 pl-4">No products found in this order</p>
-                          )}
-                        </details>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
+                ));
+              })()
             ) : (
               <div className="text-center py-8 text-gray-500">
-                No orders yet
+                Your cart is empty
               </div>
             )}
           </div>
         </div>
+
+        <div className="bg-white rounded-2xl shadow-lg p-6 hover-card fade-up" data-scroll data-scroll-speed="1.4">
+          <h2 className="text-2xl font-bold text-gray-800 mb-6">Order History</h2>
+
+          {user.orders && user.orders.length > 0 ? (
+            <div className="space-y-6">
+              {user.orders.map(order => (
+                <div className="border rounded-xl p-6 hover:border-blue-500 transition-colors" key={order._id}>
+                  <div className="grid md:grid-cols-2 gap-6">
+                    <div>
+                      <div className="mb-4">
+                        <span className={`px-4 py-2 rounded-full text-sm ${order.status === 'Pending' ? 'bg-yellow-100 text-yellow-800' : order.status === 'Delivered' ? 'bg-green-100 text-green-800' : 'bg-blue-100 text-blue-800'}`}>
+                          {order.status}
+                        </span>
+                      </div>
+                      <div className="space-y-2 text-gray-600">
+                        <p><span className="font-medium">Address:</span> {order.address}</p>
+                        <p><span className="font-medium">Contact:</span> {order.contactno}</p>
+                        <p><span className="font-medium">Payment:</span> {order.paymentMethod}</p>
+                        <p><span className="font-medium">City:</span> {order.city}</p>
+                        <p><span className="font-medium">Postal Code:</span> {order.postalcode}</p>
+                        <p><span className="font-medium">Subtotal:</span> ₹{order.products.reduce((total, product) => total + (product?.price || 0) - (product?.discount || 0), 0)}</p>
+                        <p><span className="font-medium">Shipping:</span> ₹50</p>
+                        <p className="font-medium text-lg text-gray-800 mt-2">Total: ₹{order.products.reduce((total, product) => total + (product?.price || 0) - (product?.discount || 0), 0) + 50}</p>
+                      </div>
+                    </div>
+
+                    <div className="space-y-4">
+                      <details className="group">
+                        <summary className="flex justify-between items-center cursor-pointer bg-gray-50 p-4 rounded-lg">
+                          <h3 className="font-semibold text-lg text-gray-800">Products</h3>
+                          <span className="transform group-open:rotate-180 transition-transform">
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"/>
+                            </svg>
+                          </span>
+                        </summary>
+                        {order.products && order.products.length > 0 ? (
+                          <div className="space-y-4 mt-4 pl-4">
+                            {order.products.map(product => (
+                              <div className="flex gap-4 p-4 rounded-lg bg-gray-50" key={product._id}>
+                                {product?.image ? (
+                                  <img src={`data:image/jpeg;base64,${product.image.toString('base64')}`} alt={product?.name} className="w-20 h-20 object-cover rounded-lg" />
+                                ) : (
+                                  <div className="w-20 h-20 bg-gray-200 rounded-lg flex items-center justify-center">
+                                    <span className="text-gray-400">No image</span>
+                                  </div>
+                                )}
+                                <div>
+                                  <div className="flex items-center gap-2">
+                                    <h4 className="font-medium text-gray-800">
+                                      {product?.name || 'Product Name Not Available'}
+                                    </h4>
+                                    <span className="px-2 py-1 bg-blue-100 text-blue-800 text-sm rounded-full">
+                                      x{product.quantity}
+                                    </span>
+                                  </div>
+                                  <div className="mt-1 space-x-2">
+                                    <span className="text-gray-600">₹{product?.price || 0}</span>
+                                    {product?.discount && <span className="text-green-600">(-₹{product.discount})</span>}
+                                  </div>
+                                  <p className="text-sm text-gray-500 mt-1 line-clamp-2">
+                                    {product?.description || 'No description available'}
+                                  </p>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        ) : (
+                          <p className="text-gray-500 mt-4 pl-4">No products found in this order</p>
+                        )}
+                      </details>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-8 text-gray-500">
+              No orders yet
+            </div>
+          )}
+        </div>
       </main>
     </>
-  )
+  );
 }
 
-export default Profile
+export default Profile;
