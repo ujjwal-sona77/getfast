@@ -272,7 +272,7 @@ const Cart = () => {
                 </div>
                   <Link
                     to="/checkout"
-                    className="w-full mt-6 bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 rounded-lg font-medium hover:from-blue-700 hover:to-purple-700 transition-all duration-300 transform hover:scale-[1.02]"
+                    className="w-full mt-10 bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 rounded-lg font-medium hover:from-blue-700 hover:to-purple-700 transition-all duration-300 transform hover:scale-[1.02]"
                   >
                     Proceed to Checkout
                 </Link>

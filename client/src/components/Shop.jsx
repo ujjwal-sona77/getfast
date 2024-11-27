@@ -34,7 +34,6 @@ const Shop = () => {
     try {
       const response = await axios.get(`/api/user/profile/${email}`);
       setUser(response.data.user);
-      console.log(response.data.user);
     } catch (err) {
       setError(err.message);
     }

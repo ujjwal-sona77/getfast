@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import SignUp from './components/SignUp.jsx';
 import Login from './components/Login.jsx';
@@ -9,7 +9,9 @@ import ProtectedRoutes from './components/ProtectedRoutes.jsx';
 import Cart from './components/Cart.jsx';
 import Profile from './components/Profile.jsx';
 import EditProfile from './components/EditProfile.jsx';
+import { UserDataContext } from './context/UserContext.jsx';
 const App = () => {
+
   return (
     <Routes>
       <Route path="/" element={<SignUp />} />

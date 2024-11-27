@@ -148,7 +148,7 @@ app.post("/api/cart/remove/:productid/:email", async (req, res) => {
   );
   if (index !== -1) {
     // Remove only one instance of the product
-    user.cart.splice(index, 1);
+    user.cart.splice(index);
     await user.save();
   }
   res.status(200).send({ message: "Product removed from cart", success: true });
@@ -158,6 +158,7 @@ app.post(
   upload.single("picture"),
   async (req, res) => {
     try {
+      const alerdy_user = await userModel.findOne({ email: req.body.email });
       const user = await userModel.findOneAndUpdate(
         { email: req.params.email },
         { new: true }
@@ -168,11 +169,15 @@ app.post(
       if (req.body.fullname && req.body.fullname.trim() !== "") {
         user.fullname = req.body.fullname;
       }
-      if (req.body.email && req.body.email.trim() !== "") {
-        user.email = req.body.email;
+      if (alerdy_user) {
+        res.status(501).json({ message: "Email alerdy used" });
+      } else if (!alerdy_user) {
+        if (req.body.email && req.body.email.trim() !== "") {
+          user.email = req.body.email;
+        }
       }
       await user.save();
-      let token = jwt.sign({ email: user.email }, process.env.JWT_SECRET);
+      let token = jwt.sign({ email: req.body.email }, process.env.JWT_SECRET);
       res.cookie("token", token);
       res
         .status(200)
@@ -180,9 +185,10 @@ app.post(
     } catch (err) {
       res.status(500).send({ message: err.message, success: false });
     }
+    return;
   }
-);
 
+);
 
 app.post("/api/orders/create/:email", async (req, res) => {
   const user = await userModel.findOne({ email: req.params.email });
@@ -194,12 +200,14 @@ app.post("/api/orders/create/:email", async (req, res) => {
     paymentMethod: req.body.paymentMethod,
     fullname: req.body.fullname,
     city: req.body.city,
-    postalcode: req.body.postalcode
+    postalcode: req.body.postalcode,
   });
   user.orders.push(order._id);
   user.cart = [];
   await user.save();
-  res.status(200).send({ message: "Order created successfully", success: true });
+  res
+    .status(200)
+    .send({ message: "Order created successfully", success: true });
 });
 
 app.listen(process.env.PORT, () => {

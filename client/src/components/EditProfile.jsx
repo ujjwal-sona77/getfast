@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 const EditProfile = () => {
@@ -7,6 +7,7 @@ const EditProfile = () => {
   const [picture, setPicture] = useState(null);
   const navigate = useNavigate();
   const [success, setSuccess] = useState("");
+  const [user, setUser] = useState({});
   const getEmailFromToken = () => {
     const token = document.cookie.split("=")[1];
     if (!token) {
@@ -33,13 +34,26 @@ const EditProfile = () => {
       }
     );
 
-    if (res.data.success) {
+    if (res.status == 200) {
       setSuccess(res.data.message);
       navigate("/profile");
     } else {
       setError(res.data.message);
     }
   };
+  const getUser = async () => {
+    try {
+      if (!email_Token) return; // Check if email is null before making the request
+      const response = await axios.get(`/api/user/profile/${email_Token}`);
+      setUser(response.data.user);
+    } catch (err) {
+      console.error("Error fetching user profile:", err);
+    }
+  };
+
+  useEffect(() => {
+    getUser();
+  });
   return (
     <>
       {success && <div className="text-green-500">{success}</div>}
@@ -103,8 +117,8 @@ const EditProfile = () => {
               type="text"
               name="fullname"
               id="fullname"
+              placeholder={`${user.fullname} , Enter Your New Name`}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Enter your full name"
               onChange={(e) => setFullname(e.target.value)}
             />
           </div>
@@ -121,7 +135,7 @@ const EditProfile = () => {
               name="email"
               id="email"
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Enter your email"
+              placeholder={`${user.email} Enter your new Email`}
               onChange={(e) => setEmail(e.target.value)}
             />
           </div>
