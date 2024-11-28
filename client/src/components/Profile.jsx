@@ -17,7 +17,7 @@ const Profile = () => {
   };
 
   const email = getEmailFromToken();
-  console.log(email);
+  
 
   const getUser = async () => {
     try {
