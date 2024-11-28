@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Buffer } from "buffer";
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from "react-router-dom";
 const Profile = () => {
   const [user, setUser] = useState(null);
   const navigate = useNavigate();
@@ -328,7 +328,7 @@ const Profile = () => {
                       </div>
                       <div className="space-y-2 text-gray-600">
                         <p>
-                          <span className="font-medium">Address:</span>{" "}
+                          <span className="font-medium">Address:</span>
                           {order.address}
                         </p>
                         <p>
@@ -404,7 +404,7 @@ const Profile = () => {
                               >
                                 {product?.image ? (
                                   <img
-                                    src={`data:image/jpeg;base64,${product.image.toString(
+                                    src={`data:image/jpg;base64,${product.image.toString(
                                       "base64"
                                     )}`}
                                     alt={product?.name}

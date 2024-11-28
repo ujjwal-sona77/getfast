@@ -1,3 +1,6 @@
+const userModel = require("../models/userModel")
+
+
 module.exports.AddToCart = async (req, res) => {
   const productId = req.params.productId;
   const user = await userModel.findOne({ email: req.params.user });

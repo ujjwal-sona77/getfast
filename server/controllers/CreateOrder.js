@@ -1,3 +1,7 @@
+const userModel = require("../models/userModel");
+const orderModel = require("../models/orderModel")
+
+
 module.exports.CreateOrder = async (req, res) => {
   const user = await userModel.findOne({ email: req.params.email });
   const order = await orderModel.create({
