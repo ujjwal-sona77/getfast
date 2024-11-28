@@ -91,21 +91,21 @@ const Cart = () => {
     <>
       <nav className="bg-white/80 backdrop-blur-md border-b border-gray-200 fixed w-full z-50 dark:bg-gray-900/80 dark:border-gray-700">
         <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
-          <a
-            href="/shop"
+          <Link
+            to="/shop"
             className="flex items-center space-x-3 rtl:space-x-reverse animate__animated animate__fadeIn"
           >
             <img src="/images/logo.png" className="h-8 w-auto" alt="Logo" />
             <span className="self-center text-xl font-semibold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
               getFast
             </span>
-          </a>
-          <a
-            href="/shop"
+          </Link>
+          <Link
+            to="/shop"
             className="text-gray-500 hover:text-blue-600 transition-colors duration-300 text-sm sm:text-base animate__animated animate__fadeIn"
           >
             Continue Shopping
-          </a>
+          </Link>
         </div>
       </nav>
 
@@ -240,12 +240,12 @@ const Cart = () => {
                 <p className="mt-4 text-gray-500 dark:text-gray-400">
                   Your cart is empty
                 </p>
-                <a
-                  href="/shop"
+                <Link
+                  to="/shop"
                   className="mt-4 inline-block text-blue-600 hover:text-blue-700 font-medium"
                 >
                   Start Shopping →
-                </a>
+                </Link>
               </div>
             )}
           </div>
@@ -272,7 +272,7 @@ const Cart = () => {
                 </div>
                   <Link
                     to="/checkout"
-                    className="w-full mt-10 bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 rounded-lg font-medium hover:from-blue-700 hover:to-purple-700 transition-all duration-300 transform hover:scale-[1.02]"
+                    className="w-full mt- bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 rounded-lg font-medium hover:from-blue-700 hover:to-purple-700 transition-all duration-300 transform hover:scale-[1.02]"
                   >
                     Proceed to Checkout
                 </Link>

@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Buffer from "buffer";
-import { useParams } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import { imagefrombuffer } from "imagefrombuffer";
 
 const Shop = () => {
-  const [products, setProducts] = useState([]);
+  const [products, setProducts] = useState(null);
   const [success, setSuccess] = useState("");
   const [error, setError] = useState("");
   const [user, setUser] = useState({});
@@ -23,7 +23,8 @@ const Shop = () => {
 
   const getProducts = async () => {
     try {
-      const response = await axios.get(`/api/owner/allproducts/`);
+      const response = await axios.get(`
+        /api/owner/allproducts/`);
       setProducts(response.data.products);
     } catch (err) {
       setError(err.message);
@@ -44,13 +45,24 @@ const Shop = () => {
     getUser();
   }, []);
 
+  if (!products) {
+    return (
+      <div class="flex space-x-2 justify-center items-center bg-white h-screen dark:invert">
+        <span class="sr-only">Loading...</span>
+        <div class="h-8 w-8 bg-black rounded-full animate-bounce [animation-delay:-0.3s]"></div>
+        <div class="h-8 w-8 bg-black rounded-full animate-bounce [animation-delay:-0.15s]"></div>
+        <div class="h-8 w-8 bg-black rounded-full animate-bounce"></div>
+      </div>
+    );
+  }
+
   return (
     <>
       <nav className="fixed w-full z-50 bg-white/80 backdrop-blur-md shadow-lg">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16">
             <div className="flex items-center">
-              <a href="/" className="flex items-center group">
+              <Link to="/" className="flex items-center group">
                 <img
                   src="/images/logo.png"
                   className="h-8 w-auto transform group-hover:scale-110 transition-transform duration-300"
@@ -59,42 +71,36 @@ const Shop = () => {
                 <span className="ml-2 text-xl font-semibold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
                   getFast
                 </span>
-              </a>
+              </Link>
             </div>
 
             <div className="hidden md:flex items-center space-x-6">
-              <a
-                href="/shop"
+              <Link
+                to="/shop"
                 className="menu-transition text-gray-700 hover:text-blue-600 relative after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-0 after:h-0.5 after:bg-blue-600 hover:after:w-full after:transition-all"
               >
                 Shop
-              </a>
+              </Link>
               {user?.isAdmin && (
-                <a
-                  href="/owner/createproduct"
+                <Link
+                  to="/owner/createproduct"
                   className="menu-transition text-gray-700 hover:text-blue-600 relative after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-0 after:h-0.5 after:bg-blue-600 hover:after:w-full after:transition-all"
                 >
                   Create Product
-                </a>
+                </Link>
               )}
-              <a
-                href="/cart"
+              <Link
+                to="/cart"
                 className="menu-transition text-gray-700 hover:text-blue-600 relative after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-0 after:h-0.5 after:bg-blue-600 hover:after:w-full after:transition-all"
               >
                 Cart
-              </a>
-              <a
-                href="/profile"
+              </Link>
+              <Link
+                to="/profile"
                 className="menu-transition text-gray-700 hover:text-blue-600 relative after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-0 after:h-0.5 after:bg-blue-600 hover:after:w-full after:transition-all"
               >
                 Profile
-              </a>
-              <a
-                href="/login"
-                className="menu-transition text-gray-700 hover:text-blue-600 relative after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-0 after:h-0.5 after:bg-blue-600 hover:after:w-full after:transition-all"
-              >
-                Login
-              </a>
+              </Link>
             </div>
           </div>
         </div>
@@ -126,24 +132,24 @@ const Shop = () => {
                 Categories
               </h3>
               <div className="flex flex-col space-y-3">
-                <a
-                  href="#"
+                <Link
+                  to="#"
                   className="text-gray-600 hover:text-blue-600 transition-colors"
                 >
                   New Collection
-                </a>
-                <a
-                  href="#"
+                </Link>
+                <Link
+                  to="#"
                   className="text-gray-600 hover:text-blue-600 transition-colors"
                 >
                   All Products
-                </a>
-                <a
-                  href="#"
+                </Link>
+                <Link
+                  to="#"
                   className="text-gray-600 hover:text-blue-600 transition-colors"
                 >
                   Discounted Products
-                </a>
+                </Link>
               </div>
             </div>
 
@@ -152,51 +158,50 @@ const Shop = () => {
                 Filters
               </h3>
               <div className="flex flex-col space-y-3">
-                <a
-                  href="#"
+                <Link
+                  to="#"
                   className="text-gray-600 hover:text-blue-600 transition-colors"
                 >
                   Availability
-                </a>
-                <a
-                  href="#"
+                </Link>
+                <Link
+                  to="#"
                   className="text-gray-600 hover:text-blue-600 transition-colors"
                 >
                   Discount
-                </a>
+                </Link>
               </div>
             </div>
-          </div>
-
-          {success && (
-            <div className="mt-4 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-              <div className="bg-gradient-to-r from-green-500 to-green-600 text-white p-4 rounded-lg shadow-lg">
-                <div className="flex items-center justify-between">
-                  <p className="text-sm md:text-base">{success}</p>
-                  <button
-                    onClick={(e) =>
-                      e.target.parentElement.parentElement.remove()
-                    }
-                    className="ml-4 text-white hover:text-green-200 transition-colors"
-                  >
-                    <svg
-                      className="w-4 h-4"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
+            {success && (
+              <div className="mt-4 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+                <div className="bg-gradient-to-r from-green-500 to-green-600 text-white p-4 rounded-lg shadow-lg">
+                  <div className="flex items-center justify-between">
+                    <p className="text-sm md:text-base">{success}</p>
+                    <button
+                      onClick={(e) =>
+                        e.target.parentElement.parentElement.remove()
+                      }
+                      className="ml-4 text-white hover:text-green-200 transition-colors"
                     >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M6 18L18 6M6 6l12 12"
-                      ></path>
-                    </svg>
-                  </button>
+                      <svg
+                        className="w-4 h-4"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          d="M6 18L18 6M6 6l12 12"
+                        ></path>
+                      </svg>
+                    </button>
+                  </div>
                 </div>
               </div>
-            </div>
-          )}
+            )}
+          </div>
 
           <div className="flex-1">
             <div className="grid grid-cols-2 lg:grid-cols-3 gap-6">
@@ -252,7 +257,9 @@ const Shop = () => {
                       <button
                         onClick={async () => {
                           try {
-                            await axios.post(`/api/cart/add/${product._id}/${email}`);
+                            await axios.post(
+                              `/api/cart/add/${product._id}/${email}`
+                            );
                             setSuccess("Added to cart successfully!");
                           } catch (err) {
                             setError("Failed to add to cart");

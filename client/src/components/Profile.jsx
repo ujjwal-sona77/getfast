@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Buffer } from "buffer";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from 'react-router-dom';
 const Profile = () => {
   const [user, setUser] = useState(null);
   const navigate = useNavigate();
@@ -17,6 +17,7 @@ const Profile = () => {
   };
 
   const email = getEmailFromToken();
+  console.log(email);
 
   const getUser = async () => {
     try {
@@ -33,7 +34,14 @@ const Profile = () => {
   }, []);
 
   if (!user) {
-    return <div>Loading...</div>;
+    return (
+      <div class="flex space-x-2 justify-center items-center bg-white h-screen dark:invert">
+        <span class="sr-only">Loading...</span>
+        <div class="h-8 w-8 bg-black rounded-full animate-bounce [animation-delay:-0.3s]"></div>
+        <div class="h-8 w-8 bg-black rounded-full animate-bounce [animation-delay:-0.15s]"></div>
+        <div class="h-8 w-8 bg-black rounded-full animate-bounce"></div>
+      </div>
+    );
   }
 
   return (
@@ -45,8 +53,8 @@ const Profile = () => {
       )}
       <nav className="fixed w-full z-40 bg-white/80 backdrop-blur-md shadow-lg">
         <div className="container mx-auto px-4 py-4">
-          <a
-            href="/shop"
+          <Link
+            to="/shop"
             className="inline-flex items-center text-blue-600 hover:text-blue-800 transition-colors"
           >
             <svg
@@ -63,7 +71,7 @@ const Profile = () => {
               ></path>
             </svg>{" "}
             Back to Shop
-          </a>
+          </Link>
         </div>
       </nav>
 
@@ -100,8 +108,8 @@ const Profile = () => {
                   {user.fullname}
                 </h1>
                 <p className="text-gray-600 mb-4">{user.email}</p>
-                <a
-                  href="/users/edit-profile"
+                <Link
+                  to="/users/edit-profile"
                   className="inline-flex items-center px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
                 >
                   <svg
@@ -118,7 +126,7 @@ const Profile = () => {
                     />
                   </svg>{" "}
                   Edit Profile
-                </a>
+                </Link>
               </div>
             </div>
           </div>
@@ -130,12 +138,12 @@ const Profile = () => {
         >
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-2xl font-bold text-gray-800">Shopping Cart</h2>
-            <a
-              href="/cart"
+            <Link
+              to="/cart"
               className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
             >
               View Cart
-            </a>
+            </Link>
           </div>
 
           <div className="space-y-6">
