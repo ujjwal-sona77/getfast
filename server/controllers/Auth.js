@@ -1,8 +1,6 @@
 const userModel = require("../models/userModel");
 const jwt = require("jsonwebtoken");
-const bcrypt = require("bcrypt")
-
-
+const bcrypt = require("bcrypt");
 
 module.exports.UserSignup = async (req, res) => {
   try {
@@ -56,4 +54,9 @@ module.exports.LoginUser = async (req, res) => {
   } catch (error) {
     res.status(500).json({ message: error.message, success: false });
   }
+};
+
+module.exports.Logout = (req, res) => {
+  res.clearCookie("token");
+  res.send({ message: "Logout successful", success: true });
 };

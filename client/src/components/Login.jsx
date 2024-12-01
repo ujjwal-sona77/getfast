@@ -11,7 +11,7 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post(`${import.meta.env.URL}/api/auth/login`, { email, password });
+      const response = await axios.post(`/api/auth/login`, { email, password });
       if (response.data.success) {
         navigate("/shop");
       } else if (response.data.message && !response.data.success) {
