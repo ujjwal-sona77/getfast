@@ -1,6 +1,6 @@
 const express = require("express");
 const app = express.Router();
-const { UserSignup, LoginUser, Logout } = require("./controllers/Auth");
+const { UserSignup, LoginUser, Logout } = require("../controllers/Auth");
 const { AddToCart } = require("../controllers/AddToCart");
 const { EditUser } = require("../controllers/EditUser");
 const { CreateProduct } = require("../controllers/CreateProduct");
@@ -33,4 +33,7 @@ app.post("/cart/decrease/:productid/:email", DecreaseQuantityOfProduct);
 app.post("/cart/remove/:productid/:email", RemoveProductFromCart);
 app.post("/user/editprofile/:email", EditUser);
 
-app.post("/api/orders/create/:email", CreateOrder);
+app.post("/orders/create/:email", CreateOrder);
+
+
+module.exports = app
