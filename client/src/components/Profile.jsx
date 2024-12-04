@@ -418,6 +418,7 @@ const Profile = () => {
                                   </div>
                                 )}
                                 <div>
+                                
                                   <div className="flex items-center gap-2">
                                     <h4 className="font-medium text-gray-800">
                                       {product?.name ||

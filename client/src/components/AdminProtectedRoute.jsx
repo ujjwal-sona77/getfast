@@ -1,43 +1,49 @@
-import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { Navigate, Outlet } from "react-router-dom";
+import axios from "axios";
 
-const AdminProtectedRoute = () => {
-  const [user, setUser] = useState({});
+const AdminAuth = () => {
+  const [user, setUser] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
   const getEmailFromToken = () => {
-    try {
-      const token = document.cookie.split("=")[1];
-      if (!token) {
-        return null;
-      }
-      const payload = JSON.parse(atob(token.split(".")[1]));
-      return payload.email;
-    } catch (err) {
-      setError("Invalid authentication token");
-      return null;
+    const token = document.cookie.split("=")[1];
+    if (!token) {
+      return null; // Return null instead of throwing an error
     }
+    const payload = JSON.parse(atob(token.split(".")[1]));
+    return payload.email;
   };
 
-  const email = getEmailFromToken();
-  const getUser = async () => {
-    try {
-      if (!email) return; // Check if email is null before making the request
-      const response = await axios.get(`/api/user/profile/${email}`);
-      setUser(response.data.user);
-    } catch (err) {
-      console.error("Error fetching user profile:", err.message);
-    }
-  };
-
+  const email_Token = getEmailFromToken();
   useEffect(() => {
-    getUser();
+    const checkAdminStatus = async () => {
+      try {
+        const response = await axios.get(`/api/user/profile/${email_Token}`, {
+          withCredentials: true,
+        });
+        setUser(response.data.user);
+      } catch (error) {
+        console.error("Error checking admin status:", error);
+        setIsAdmin(false);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    checkAdminStatus();
   }, []);
-  if (user.isAdmin != true) {
-    alert("error");
-    return <Navigate to="/login" />;
+
+  if (isLoading) {
+    return <div>Loading...</div>; // You can replace this with a loading spinner component
   }
 
-  return <Outlet />;
+  if (user.isAdmin) {
+    return <Outlet />; //
+  } else {
+    alert("Something went wrong. Please try again")
+    return <Navigate to="/shop" />
+   }
+
 };
 
-export default AdminProtectedRoute;
+export default AdminAuth;
