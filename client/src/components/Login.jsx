@@ -11,21 +11,13 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/auth/login`, { email, password } , {withCredentials: true});
+      const response = await axios.post(
+        `${import.meta.env.VITE_BACKEND_URL}/api/auth/login`,
+        { email, password },
+        { withCredentials: true }
+      );
       if (response.data.success) {
-        navigate("/shop");   const user = await userModel.findOneAndUpdate({ email: req.user.email }, { new: true });
-        if (req.file) {
-            user.picture = req.file.buffer;
-        }
-        if (req.body.fullname && req.body.fullname.trim() !== "") {
-            user.fullname = req.body.fullname;
-        }
-        if (req.body.email && req.body.email.trim() !== "") {
-            user.email = req.body.email;
-        }
-        await user.save();
-        let token = jwt.sign({ email: user.email }, process.env.JWT_SECRET);
-        res.cookie("token", token);
+        navigate("/shop");
       } else if (response.data.message && !response.data.success) {
         setError(response.data.message);
       }
