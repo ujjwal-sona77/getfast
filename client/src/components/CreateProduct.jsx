@@ -14,10 +14,10 @@ const CreateProduct = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post("/api/owner/createproduct", { name, price, discount , image}, {
+      const response = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/owner/create`, { name, price, discount , image},  {withCredentials: true} ,{
         headers: {
           "Content-Type": "multipart/form-data",
-        },
+        } 
       });
       if(response.data.success){
         navigate("/owner/createproduct");
@@ -69,7 +69,7 @@ const CreateProduct = () => {
 
             <form
               autoComplete="off"
-              method="post"
+              method="POST"
               encType="multipart/form-data"
               onSubmit={handleSubmit}
             >

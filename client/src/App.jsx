@@ -16,12 +16,13 @@ const App = () => {
       <Route path="/" element={<SignUp />} />
       <Route path="/login" element={<Login />} />
       <Route element={<ProtectedRoutes />}>
-        <Route path="/shop" element={<Shop />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/users/edit-profile" element={<EditProfile />} />
         <Route path="/cart" element={<Cart />} />
+        <Route path="/shop" element={<Shop />} />
         <Route path="/checkout" element={<Checkout />} />
       </Route>
+
       <Route element={<AdminProtectedRoute />}>
         <Route path="/owner/createproduct" element={<CreateProduct />} />
       </Route>

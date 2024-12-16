@@ -17,12 +17,13 @@ const Profile = () => {
   };
 
   const email = getEmailFromToken();
-  
 
   const getUser = async () => {
     try {
       if (!email) return; // Check if email is null before making the request
-      const response = await axios.get(`/api/user/profile/${email}`);
+      const response = await axios.get(
+        `${import.meta.env.VITE_BACKEND_URL}/api/user/profile/${email}`
+      );
       setUser(response.data.user);
     } catch (err) {
       console.error("Error fetching user profile:", err);
@@ -35,11 +36,8 @@ const Profile = () => {
 
   if (!user) {
     return (
-      <div class="flex space-x-2 justify-center items-center bg-white h-screen dark:invert">
-        <span class="sr-only">Loading...</span>
-        <div class="h-8 w-8 bg-black rounded-full animate-bounce [animation-delay:-0.3s]"></div>
-        <div class="h-8 w-8 bg-black rounded-full animate-bounce [animation-delay:-0.15s]"></div>
-        <div class="h-8 w-8 bg-black rounded-full animate-bounce"></div>
+      <div className="flex space-x-2 justify-center items-center bg-white h-screen dark:invert">
+        <l-waveform size="35" stroke="3.5" speed="1" color="black"></l-waveform>
       </div>
     );
   }
@@ -418,7 +416,6 @@ const Profile = () => {
                                   </div>
                                 )}
                                 <div>
-                                
                                   <div className="flex items-center gap-2">
                                     <h4 className="font-medium text-gray-800">
                                       {product?.name ||

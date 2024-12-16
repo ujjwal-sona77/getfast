@@ -21,7 +21,7 @@ app.post("/cart/add/:productId/:user", AddToCart);
 
 app.get("/auth/logout", Logout);
 
-app.post("/owner/createproduct", CreateProduct);
+app.post("/owner/create", CreateProduct);
 
 app.get("/owner/allproducts/", GetAllProducts);
 app.get("/user/profile/:email", GetProfile);

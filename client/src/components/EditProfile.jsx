@@ -21,7 +21,7 @@ const EditProfile = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const res = await axios.post(
-      `/api/user/editprofile/${email_Token}`,
+      `${import.meta.env.VITE_BACKEND_URL}/api/user/editprofile/${email_Token}`,
       {
         fullname,
         email,
@@ -44,7 +44,9 @@ const EditProfile = () => {
   const getUser = async () => {
     try {
       if (!email_Token) return; // Check if email is null before making the request
-      const response = await axios.get(`/api/user/profile/${email_Token}`);
+      const response = await axios.get(
+        `${import.meta.env.VITE_BACKEND_URL}/api/user/profile/${email_Token}`
+      );
       setUser(response.data.user);
     } catch (err) {
       console.error("Error fetching user profile:", err);
@@ -57,11 +59,8 @@ const EditProfile = () => {
 
   if (!user) {
     return (
-      <div class="flex space-x-2 justify-center items-center bg-white h-screen dark:invert">
-        <span class="sr-only">Loading...</span>
-        <div class="h-8 w-8 bg-black rounded-full animate-bounce [animation-delay:-0.3s]"></div>
-        <div class="h-8 w-8 bg-black rounded-full animate-bounce [animation-delay:-0.15s]"></div>
-        <div class="h-8 w-8 bg-black rounded-full animate-bounce"></div>
+      <div className="flex space-x-2 justify-center items-center bg-white h-screen dark:invert">
+        <l-waveform size="35" stroke="3.5" speed="1" color="black"></l-waveform>
       </div>
     );
   } else {

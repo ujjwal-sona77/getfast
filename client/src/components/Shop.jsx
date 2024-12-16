@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Buffer from "buffer";
+import "ldrs/waveform";
 import { useParams, Link } from "react-router-dom";
 import { imagefrombuffer } from "imagefrombuffer";
 
@@ -24,7 +25,7 @@ const Shop = () => {
   const getProducts = async () => {
     try {
       const response = await axios.get(`
-        /api/owner/allproducts/`);
+        ${import.meta.env.VITE_BACKEND_URL}/api/owner/allproducts/`);
       setProducts(response.data.products);
     } catch (err) {
       setError(err.message);
@@ -33,7 +34,9 @@ const Shop = () => {
 
   const getUser = async () => {
     try {
-      const response = await axios.get(`/api/user/profile/${email}`);
+      const response = await axios.get(
+        `${import.meta.env.VITE_BACKEND_URL}/api/user/profile/${email}`
+      );
       setUser(response.data.user);
     } catch (err) {
       setError(err.message);
@@ -47,11 +50,8 @@ const Shop = () => {
 
   if (!products) {
     return (
-      <div class="flex space-x-2 justify-center items-center bg-white h-screen dark:invert">
-        <span class="sr-only">Loading...</span>
-        <div class="h-8 w-8 bg-black rounded-full animate-bounce [animation-delay:-0.3s]"></div>
-        <div class="h-8 w-8 bg-black rounded-full animate-bounce [animation-delay:-0.15s]"></div>
-        <div class="h-8 w-8 bg-black rounded-full animate-bounce"></div>
+      <div className="flex space-x-2 justify-center items-center bg-white h-screen dark:invert">
+        <l-waveform size="35" stroke="3.5" speed="1" color="black"></l-waveform>
       </div>
     );
   }
@@ -258,7 +258,7 @@ const Shop = () => {
                         onClick={async () => {
                           try {
                             await axios.post(
-                              `/api/cart/add/${product._id}/${email}`
+                              `${import.meta.env.VITE_BACKEND_URL}/api/cart/add/${product._id}/${email}`
                             );
                             setSuccess("Added to cart successfully!");
                           } catch (err) {

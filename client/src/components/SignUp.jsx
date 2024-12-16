@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
+
 const SignUp = () => {
   const [formData, setFormData] = useState({
     fullname: '',
@@ -12,6 +13,8 @@ const SignUp = () => {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const navigate = useNavigate();
+
+
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -28,11 +31,11 @@ const SignUp = () => {
     }
 
     try {
-      const response = await axios.post('/api/auth/signup', {
+      const response = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/auth/signup`, {
         fullname: formData.fullname,
         email: formData.email,
         password: formData.password,
-      });
+      } , {withCredentials: true});
 
       if (response.data.success) {
         setSuccess('Sign up successful! Redirecting to Shop...');
@@ -41,7 +44,7 @@ const SignUp = () => {
         setError(response.data.message || 'Sign up failed');
       }
     } catch (err) {
-      setError(err.response?.data?.message || 'An error occurred during sign up');
+     console.log(err.message || err)
     }
   };
 

@@ -33,7 +33,7 @@ const Checkout = () => {
 
   const getUser = async () => {
     try {
-      const response = await axios.get(`/api/user/profile/${email}`);
+      const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/user/profile/${email}`);
       setUser(response.data.user);
       if (response.data.user.cart) {
         const groupedCart = response.data.user.cart.reduce((acc, item) => {

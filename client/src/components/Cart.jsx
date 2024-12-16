@@ -27,7 +27,7 @@ const Cart = () => {
 
   const getUser = async () => {
     try {
-      const response = await axios.get(`/api/user/profile/${email}`);
+      const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/user/profile/${email}`);
       setUser(response.data.user);
       if (response.data.user.cart) {
         // Group same products and add quantities
@@ -67,9 +67,9 @@ const Cart = () => {
   const handleQuantityChange = async (itemId, action) => {
     try {
       if (action === "increase") {
-        await axios.post(`/api/cart/increase/${itemId}/${email}`);
+        await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/cart/increase/${itemId}/${email}`);
       } else if (action === "decrease") {
-        await axios.post(`/api/cart/decrease/${itemId}/${email}`);
+        await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/cart/decrease/${itemId}/${email}`);
       }
     } catch (err) {
       setError(err.response?.data?.message || "Error updating quantity");
@@ -78,7 +78,7 @@ const Cart = () => {
 
   const handleRemoveItem = async (itemId) => {
     try {
-      await axios.post(`/api/cart/remove/${itemId}/${email}`);
+      await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/cart/remove/${itemId}/${email}`);
     } catch (err) {
       setError(err.response?.data?.message || "Error removing item");
     }

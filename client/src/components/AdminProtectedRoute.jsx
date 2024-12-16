@@ -18,7 +18,7 @@ const AdminAuth = () => {
   useEffect(() => {
     const checkAdminStatus = async () => {
       try {
-        const response = await axios.get(`/api/user/profile/${email_Token}`, {
+        const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/user/profile/${email_Token}`, {
           withCredentials: true,
         });
         setUser(response.data.user);
